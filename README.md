@@ -35,7 +35,7 @@ script then waits for the Tor SOCKS proxy to be up before executing your command
 
 ### Arguments:
 
-By default, args to `docker run` are passed to [/custom/bin/nmap](/custom/bin/nmap)
+By default, args to `docker run` are passed to [/bin/nmap](/bin/nmap)
 which calls nmap with args `-sT -PN -n "$@"` necessary for it to work over Tor ([via explainshell.com](https://explainshell.com/explain?cmd=nmap+-sT+-PN+-n)).
 
 For example, this:
@@ -51,8 +51,8 @@ proxychains4 -f /etc/proxychains.conf /usr/bin/nmap -sT -PN -n -p 80,443 faceboo
 ```
 
 In addition to the custom script for `nmap`, custom wrapper scripts for `curl`
-and `nc` exist to wrap them in proxychains, at [/custom/bin/curl](/custom/bin/curl)
-and [/custom/bin/nc](/custom/bin/nc). To call them, simply specify `curl` or `nc`
+and `nc` exist to wrap them in proxychains, at [/bin/curl](/bin/curl)
+and [/bin/nc](/bin/nc). To call them, simply specify `curl` or `nc`
 as the first argument to `docker run`. For example:
 
 ``` bash
