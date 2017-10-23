@@ -1,0 +1,4 @@
+SocksPort 0.0.0.0:9050
+Log debug stderr
+DataDirectory /var/lib/tor
+DNSPort 0.0.0.0:9053

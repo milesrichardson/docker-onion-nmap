@@ -1,0 +1,44 @@
+#!/bin/sh
+
+set -e
+
+DEBUG_LEVEL=${DEBUG_LEVEL-0}
+
+counter=0
+
+socket_open() {
+    echo "[tor_wait retry $counter] Check socket is open on localhost:9050..."
+    /usr/bin/nc -z localhost 9050 \
+        && { echo "[tor_wait retry $counter] Socket OPEN on localhost:9050" ; sleep 1 ; return 0 ; } \
+        || { echo "[tor_wait retry $counter] Socket CLOSED on localhost:9050, try again..." ; return 1 ; }
+}
+
+proxy_up() {
+    echo "[tor_wait retry $counter] Check SOCKS proxy is up on localhost:9050 (timeout $(($((counter+1))*2)) )..."
+    /usr/bin/curl --max-time $(($((counter+1))*2)) -s -f -I -x socks4h://localhost:9050 http://ipinfo.io/json \
+        >/dev/null 2>&1 \
+        && { echo "[tor_wait retry $counter] SOCKS proxy UP on localhost:9050" ; return 0 ; }  \
+        || { echo "[tor_wait retry $counter] SOCKS proxy DOWN on localhost:9050, try again..." ; return 1 ; }
+}
+
+is_ready() {
+    if test "$DEBUG_LEVEL" -eq 0 ; then
+        socket_open >/dev/null 2>&1 && proxy_up >/dev/null 2>&1 && return 0 || return 1
+    else
+        socket_open && proxy_up && return 0 || return 1
+    fi
+}
+
+echo "[tor_wait] Wait for Tor to boot... (might take a while)"
+while true
+do
+    is_ready && { \
+        test $counter -eq 0 && { break ; } || { echo "[tor_wait] Done. Tor booted." ; break ; } ; \
+    }
+
+    counter=$((counter+1))
+    sleep 0.5
+done
+
+# Use Tor for all DNS queries:
+echo 'nameserver 127.0.0.1' > /etc/resolv.conf
