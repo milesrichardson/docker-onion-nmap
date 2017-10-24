@@ -2,7 +2,7 @@
 
 Use nmap to scan hidden "onion" services on the Tor network. Minimal image
 based on alpine, using proxychains to wrap nmap. Tor and dnsmasq are run
-as daemons via s6, and proxychains wraps nmap to use the Tor SOCKS proxy on port 9050, which is configured to use the dnsmasq DNS server on port 9053.
+as daemons via s6, and proxychains wraps nmap to use the Tor SOCKS proxy on port 9050. Tor is also configured via [DNSPort](https://www.torproject.org/docs/tor-manual.html.en#DNSPort) to anonymously resolve DNS requests to port 9053. dnsmasq is configured to with this localhost:9053 as an authority DNS server. Proxychains is configured to proxy DNS through the local resolver, so all DNS requests will go through Tor and applications can resolve .onion addresses.
 
 ### Example:
 
